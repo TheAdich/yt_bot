@@ -1,0 +1,29 @@
+{
+  "name": "youtube_shorts_bot",
+  "version": "1.0.0",
+  "description": "Application to schedule and upload ai-genrated shorts to youtube",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.8.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-fileupload": "^1.5.2",
+    "express-upload": "^0.1.0",
+    "ffmpeg": "^0.0.4",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^168.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.3",
+    "remotion": "^4.0.383",
+    "text2wav": "^0.0.14"
+  }
+}
