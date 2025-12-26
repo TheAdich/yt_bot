@@ -97,7 +97,7 @@ app.get('/auth/google/callback', async (req, res) => {
             const update_values = [token_object.tokens.access_token, token_object.tokens.refresh_token, token_object.tokens.expiry_date, user_details.data.id];
             const update_res = await pg.query(update_query, update_values);
             // return to the server with a success message
-            res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none' });
+            res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', domain:'yt-bot-aeit.onrender.com' });
             return res.redirect(`https://yt-bot-five.vercel.app/dashboard`);
         }
         else {
@@ -108,7 +108,7 @@ app.get('/auth/google/callback', async (req, res) => {
                 console.log('User details inserted successfully');
                 const json_web_token = jwt.sign({ user_id: user_details.data.id, user_name: user_details.data.name }, process.env.JWT_SECRET);
                 // return to the server with a success message
-                res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none' });
+                res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', domain:'yt-bot-aeit.onrender.com' });
                 return res.redirect(`https://yt-bot-five.vercel.app/dashboard`);
             }
             else {
