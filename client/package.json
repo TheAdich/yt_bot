@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "vercel-build": "npm run prepare && next build"
+    "prepare":"echo \"Client setup complete.\""
   },
   "dependencies": {
     "axios": "^1.13.2",
