@@ -109,7 +109,7 @@ app.get('/auth/google/callback', async (req, res) => {
                 const json_web_token = jwt.sign({ user_id: user_details.data.id, user_name: user_details.data.name }, process.env.JWT_SECRET);
                 // return to the server with a success message
                 res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none' });
-                return res.redirect(`http://localhost:3000/dashboard`);
+                return res.redirect(`https://yt-bot-five.vercel.app/dashboard`);
             }
             else {
                 console.log('Failed to insert user details');
