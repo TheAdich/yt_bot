@@ -20,7 +20,7 @@ const app = express();
 
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://yt-bot-five.vercel.app'],
     METHODS: ['POST', 'GET'],
     credentials: true
 }))
@@ -98,7 +98,7 @@ app.get('/auth/google/callback', async (req, res) => {
             const update_res = await pg.query(update_query, update_values);
             // return to the server with a success message
             res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none' });
-            return res.redirect(`http://localhost:3000/dashboard`);
+            return res.redirect(`https://yt-bot-five.vercel.app/dashboard`);
         }
         else {
             const insert_query = `INSERT INTO users (user_id,user_name,picture_url,access_token,refresh_token,expiry_date) VALUES ($1,$2,$3,$4,$5,$6)`;
@@ -373,7 +373,7 @@ async function add_voice_to_video(scripts, user_id) {
 
         const video_script = scripts.join('\n');
         //console.log('video_script', video_script);
-        const piper_res = await fetch('http://localhost:5001/', {
+        const piper_res = await fetch('https://piper-tts-v1.onrender.com', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
