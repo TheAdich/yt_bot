@@ -6,7 +6,7 @@ export default function LandingPage() {
 
 
   function handleSubmit() {
-    window.location.href = 'http://localhost:5000/auth/google';
+    window.location.href = 'https://yt-bot-aeit.onrender.com/auth/google';
   }
 
 

@@ -47,7 +47,7 @@ cloudinary.config({
 //Google Auth Setup
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLINET_SCERET;
-const redirectUri = 'http://localhost:5000/auth/google/callback';
+const redirectUri = 'https://yt-bot-aeit.onrender.com/auth/google/callback';
 const OAuth2Client = new google.auth.OAuth2(
     clientId,
     clientSecret,
