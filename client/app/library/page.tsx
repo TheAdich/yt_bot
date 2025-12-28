@@ -30,7 +30,7 @@ export default function Library() {
         const fetchUserUploadedVideo = async () => {
             try {
                 setLoading(true)
-                const res = await axios.get('https://yt-bot-aeit.onrender.com/api/get_user_collections', {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get_user_collections`, {
                     withCredentials: true,
                 })
                 setUserVideoList(res.data.collections)

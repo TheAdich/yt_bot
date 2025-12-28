@@ -22,10 +22,10 @@ export default function Upload() {
         const fetchVideoLists = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('https://yt-bot-aeit.onrender.com/api/cloudinary_resources', {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cloudinary_resources`, {
                     withCredentials: true,
                 });
-                console.log(res.data.resources);
+                //console.log(res.data.resources);
                 setVideoList(res.data.resources);
 
             } catch (err) {
@@ -54,7 +54,7 @@ export default function Upload() {
             const scriptArray = scriptContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             //console.log("Script to submit:", scriptArray);
             //console.log(videoTitle, videoDesc);
-            const res = await axios.post('https://yt-bot-aeit.onrender.com/api/add_script', {
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add_script`, {
                 scripts: scriptArray,
                 video_url: selectedVideo.url,
                 video_title: videoTitle,
@@ -65,7 +65,7 @@ export default function Upload() {
             });
             //console.log("Script submitted successfully:", res.data);
             //console.log("Script to submit:", scriptArray);
-            setVideoUploadComponent(true);
+            if(res.status === 200) setVideoUploadComponent(true);
         } catch (err) {
             console.error("Error submitting script:", err);
         }
@@ -81,7 +81,7 @@ export default function Upload() {
         //console.log(formData);
         try {
             setIsVideoUploading(true);
-            const res = await axios.post("https://yt-bot-aeit.onrender.com/api/upload_to_cloudinary", formData, {
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload_to_cloudinary`, formData, {
                 withCredentials: true,
                 headers: {
                     "Content-Type": "multipart/form-data",
