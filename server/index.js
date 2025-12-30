@@ -412,9 +412,8 @@ async function add_script_to_video(audio_file, video_url, user_id) {
 
 
         // FFmpeg command
-        const ffmpegCommand = `ffmpeg -y -i "${video_url}" -i "${audio_file}" -filter_complex "[0:a?]volume=0.3[bg];[1:a]volume=1.8[voice];[bg][voice]amix=inputs=2:dropout_transition=0[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 128k -shortest "${output}"
+       const ffmpegCommand = `ffmpeg -y -i "${video_url}" -i "${audio_file}" -filter_complex "[0:a]volume=0.3[bg];[1:a]volume=1.8[voice];[bg][voice]amix=inputs=2:dropout_transition=0[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 128k -shortest "${output}"`;
 
-`;
 
 
 
