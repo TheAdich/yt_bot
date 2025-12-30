@@ -5,8 +5,10 @@ import ServerStatusList from '../components/uploading_status/uploading_status';
 import Loading from '../components/loader/loading';
 import { Navbar } from '../components/Navbar/navbar';
 import UploadSuccess from '../components/success_upload/VideoUploadSuccess';
+import { type } from 'node:os';
 
 export default function Upload() {
+
     const [videoList, setVideoList] = useState<Array<{ display_name: string, url: string }>>([]);
     const [selectedVideo, setSelectedVideo] = useState<{ index: Number, display_name: string, url: string } | null>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -18,15 +20,25 @@ export default function Upload() {
     const [refreshVideoList, setRefreshVideoList] = useState(false);
     const [isVideoUploading, setIsVideoUploading] = useState(false);
     const [VideoUploadComponent, setVideoUploadComponent] = useState<boolean>(false);
+
+
+
     useEffect(() => {
         const fetchVideoLists = async () => {
             try {
-                setLoading(true);
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cloudinary_resources`, {
-                    withCredentials: true,
-                });
-                //console.log(res.data.resources);
-                setVideoList(res.data.resources);
+                if (typeof window !== 'undefined') {
+                    setLoading(true);
+                    //console.log(window_obj?.localStorage.getItem('uuid'));
+                    const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cloudinary_resources`, {
+                        withCredentials: true,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': window ? window.localStorage.getItem('uuid') || '' : ''
+                        },
+                    });
+                    //console.log(res.data.resources);
+                    setVideoList(res.data.resources);
+                }
 
             } catch (err) {
                 console.log(err);
@@ -46,26 +58,33 @@ export default function Upload() {
     const handleScriptSubmission = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            if (selectedVideo === null) {
-                alert("Please select a video first!");
-                return;
-            }
-            setIsUploading(true);
-            const scriptArray = scriptContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            //console.log("Script to submit:", scriptArray);
-            //console.log(videoTitle, videoDesc);
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add_script`, {
-                scripts: scriptArray,
-                video_url: selectedVideo.url,
-                video_title: videoTitle,
-                video_desc: videoDesc,
-            }, {
-                withCredentials: true,
+            if (typeof window !== 'undefined') {
+                if (selectedVideo === null) {
+                    alert("Please select a video first!");
+                    return;
+                }
+                setIsUploading(true);
+                const scriptArray = scriptContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                //console.log("Script to submit:", scriptArray);
+                //console.log(videoTitle, videoDesc);
+                console.log(window?.localStorage.getItem('uuid'));
+                const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/add_script`, {
+                    scripts: scriptArray,
+                    video_url: selectedVideo.url,
+                    video_title: videoTitle,
+                    video_desc: videoDesc,
+                }, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': window ? window.localStorage.getItem('uuid') || '' : ''
+                    },
 
-            });
-            //console.log("Script submitted successfully:", res.data);
-            //console.log("Script to submit:", scriptArray);
-            if(res.status === 200) setVideoUploadComponent(true);
+                });
+                //console.log("Script submitted successfully:", res.data);
+                //console.log("Script to submit:", scriptArray);
+                if (res.status === 200) setVideoUploadComponent(true);
+            }
         } catch (err) {
             console.error("Error submitting script:", err);
         }
@@ -80,15 +99,18 @@ export default function Upload() {
         formData.append("user_video_upload", file);
         //console.log(formData);
         try {
-            setIsVideoUploading(true);
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload_to_cloudinary`, formData, {
-                withCredentials: true,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            //console.log("Video uploaded to cloudinary:", res.data);
-            if (res.status === 200) setVideoList((prev) => [...prev, { display_name: res.data.display_name, url: res.data.url }]);
+            if (typeof window !== 'undefined') {
+                setIsVideoUploading(true);
+                const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload_to_cloudinary`, formData, {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        'Authorization': window ? window.localStorage.getItem('uuid') || '' : ''
+                    },
+                });
+                //console.log("Video uploaded to cloudinary:", res.data);
+                if (res.status === 200) setVideoList((prev) => [...prev, { display_name: res.data.display_name, url: res.data.url }]);
+            }
         } catch (err) {
             console.log("Error uploading video to cloudinary:", err);
         }

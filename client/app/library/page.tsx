@@ -5,6 +5,7 @@ import Loading from '../components/loader/loading'
 import { Navbar } from '../components/Navbar/navbar'
 
 export default function Library() {
+    let window_obj : Window | null = null;
     const [userVideoList, setUserVideoList] = useState<Array<{
         title: string
         asset_id: string
@@ -15,6 +16,7 @@ export default function Library() {
     }>>([])
 
     const [loading, setLoading] = useState<boolean>(false)
+    
 
     const formateDate = (date: string) => {
         return new Date(date || Date.now()).toLocaleString('en-US', {
@@ -27,11 +29,18 @@ export default function Library() {
     }
 
     useEffect(() => {
+        if(typeof window !== 'undefined'){
+            window_obj = window;
+        }
         const fetchUserUploadedVideo = async () => {
             try {
                 setLoading(true)
                 const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get_user_collections`, {
                     withCredentials: true,
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization':window_obj? window_obj.localStorage.getItem('uuid')||''  :''
+                    }
                 })
                 setUserVideoList(res.data.collections)
             } catch (err) {

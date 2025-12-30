@@ -1,8 +1,22 @@
 'use client'
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navbar } from '../components/Navbar/navbar';
+import { useSearchParams } from 'next/navigation'
+
 
 export function DashboardPage() {
+    let window_obj = null;
+    const searchParams = useSearchParams();
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window_obj = window;
+            const uuid = searchParams.get('uuid');
+            if (uuid) {
+                window_obj?.localStorage.setItem('uuid', uuid)
+            }
+        }
+    }, [])
+
     return (
         <React.Fragment>
             {/* CHANGED: Main background from black to Cream (#F9FAF4). 
@@ -16,7 +30,7 @@ export function DashboardPage() {
                 </div>
 
                 <div className="flex-1 p-10">
-                    
+
                     {/* Header Section - Added for the big bold typography feel */}
                     <div className="mb-10">
                         <h1 className="text-6xl font-black tracking-tight uppercase leading-none text-[#F9A66C]">
@@ -32,14 +46,14 @@ export function DashboardPage() {
                        Used the Dark Slate (#4A6163) as the block background for high contrast.
                     */}
                     <div className="relative overflow-hidden rounded-3xl bg-[#4A6163] p-12 mb-10 shadow-xl">
-                        
+
                         {/* Decorative Circle (Abstract Art Vibe) */}
                         <div className="absolute -right-10 -top-10 h-64 w-64 rounded-full bg-[#F9A66C] opacity-20 blur-3xl"></div>
                         <div className="absolute -left-10 -bottom-10 h-64 w-64 rounded-full bg-[#F17A7E] opacity-20 blur-3xl"></div>
 
                         <div className="relative z-10 space-y-6">
                             <h2 className="text-4xl font-bold tracking-tight text-[#F9FAF4]">
-                                Analytics Module <br/>
+                                Analytics Module <br />
                                 <span className="text-[#FFC94B]">Coming Soon</span>
                             </h2>
 

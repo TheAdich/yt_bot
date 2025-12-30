@@ -11,6 +11,8 @@ import fs from 'fs';
 import cookieParser from 'cookie-parser';
 import { v2 as cloudinary } from 'cloudinary';
 import fileUpload from 'express-fileupload';
+import middleware from './middleware.js';
+import { json } from 'stream/consumers';
 
 
 //Setting up the server
@@ -46,13 +48,18 @@ cloudinary.config({
 
 //Google Auth Setup
 const clientId = process.env.CLIENT_ID;
-const clientSecret = process.env.CLINET_SCERET;
-const redirectUri = 'https://yt-bot-aeit.onrender.com/auth/google/callback';
+const clientSecret = process.env.CLIENT_SECRET;
+const redirectUri = `https://yt-bot-aeit.onrender.com/auth/google/callback`;
+
+
 const OAuth2Client = new google.auth.OAuth2(
     clientId,
     clientSecret,
     redirectUri
 )
+
+
+
 
 const scopes = [
     'https://www.googleapis.com/auth/youtube',
@@ -71,7 +78,8 @@ const authUrl = OAuth2Client.generateAuthUrl({
 
 
 app.get('/auth/google', async (req, res) => {
-
+    //console.log("REDIRECT_URI USED:", redirectUri);
+    console.log("Auth URL:", authUrl);
     res.redirect(authUrl);
 })
 
@@ -93,23 +101,23 @@ app.get('/auth/google/callback', async (req, res) => {
             //console.log('User already exists');
             const json_web_token = jwt.sign({ user_id: user_details.data.id, user_name: user_details.data.name }, process.env.JWT_SECRET);
             //update the access token and refresh token in the database
-            const update_query = `UPDATE users SET access_token=$1, refresh_token=$2, expiry_date=$3 WHERE user_id=$4`;
-            const update_values = [token_object.tokens.access_token, token_object.tokens.refresh_token, token_object.tokens.expiry_date, user_details.data.id];
+            const update_query = `UPDATE users SET access_token=$1, jwt_token=$2, refresh_token=$3, expiry_date=$4 WHERE user_id=$5`;
+            const update_values = [token_object.tokens.access_token, json_web_token, token_object.tokens.refresh_token, token_object.tokens.expiry_date, user_details.data.id];
             const update_res = await pg.query(update_query, update_values);
             // return to the server with a success message
-            res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', path:'/' });
-            return res.redirect(`https://yt-bot-five.vercel.app/dashboard`);
+            //res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', path:'/' });
+            return res.redirect(`https://yt-bot-five.vercel.app/dashboard?uuid=${json_web_token}`);
         }
         else {
-            const insert_query = `INSERT INTO users (user_id,user_name,picture_url,access_token,refresh_token,expiry_date) VALUES ($1,$2,$3,$4,$5,$6)`;
-            const values = [user_details.data.id, user_details.data.name, user_details.data.picture, token_object.tokens.access_token, token_object.tokens.refresh_token, token_object.tokens.expiry_date];
+            const insert_query = `INSERT INTO users (user_id,user_name,picture_url,access_token,jwt_token,refresh_token,expiry_date) VALUES ($1,$2,$3,$4,$5,$6,$7)`;
+            const values = [user_details.data.id, user_details.data.name, user_details.data.picture, token_object.tokens.access_token, json_web_token, token_object.tokens.refresh_token, token_object.tokens.expiry_date];
             const db_res = await pg.query(insert_query, values);
             if (db_res.rowCount > 0) {
                 console.log('User details inserted successfully');
                 const json_web_token = jwt.sign({ user_id: user_details.data.id, user_name: user_details.data.name }, process.env.JWT_SECRET);
                 // return to the server with a success message
-                res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', path:'/' });
-                return res.redirect(`https://yt-bot-five.vercel.app/dashboard`);
+                //res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', path:'/' });
+                return res.redirect(`https://yt-bot-five.vercel.app/dashboard?uuid=${json_web_token}`);
             }
             else {
                 console.log('Failed to insert user details');
@@ -165,21 +173,16 @@ async function refreshAccessToken(user_id) {
     }
 }
 
-app.get('/', (req, res) => {
+app.get('/', middleware,(req, res) => {
     res.send('Hello World!');
 });
 
-
-
 // get all the resources in cloudinary
-app.get('/api/cloudinary_resources', async (req, res) => {
+app.get('/api/cloudinary_resources', middleware,async (req, res) => {
     try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
+        
 
-        const user_id = jwt.verify(token, process.env.JWT_SECRET).user_id;
+        const user_id = req.user;
         const resources = await cloudinary.api.resources({
             resource_type: 'video',
             type: 'upload',
@@ -201,7 +204,7 @@ app.get('/api/cloudinary_resources', async (req, res) => {
     }
 });
 
-app.post('/api/upload_to_cloudinary', async (req, res) => {
+app.post('/api/upload_to_cloudinary', middleware,async (req, res) => {
     try {
         if (!req.files || !req.files.user_video_upload) {
             return res.status(400).json({ error: "No file uploaded" });
@@ -210,13 +213,9 @@ app.post('/api/upload_to_cloudinary', async (req, res) => {
         const videoFile = req.files.user_video_upload;
         console.log("Received file:", videoFile);
 
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
+        
 
-        const user_id = jwt.verify(token, process.env.JWT_SECRET).user_id;
-
+        const user_id = req.user;
         const uploadResult = await cloudinary.uploader.upload(
             videoFile.tempFilePath,
             {
@@ -241,12 +240,12 @@ app.post('/api/upload_to_cloudinary', async (req, res) => {
 
 
 //post request to add script to video
-app.post('/api/add_script', async (req, res) => {
+app.post('/api/add_script', middleware, async (req, res) => {
 
     try {
         const { scripts, video_url, video_title, video_desc } = req.body;
-        const token = req.cookies.token;
-        const user_id = jwt.verify(token, process.env.JWT_SECRET).user_id;
+        //const token = req.cookies.token;
+        const user_id = req.user;
         //console.log(scripts);
         const audio_file = await add_voice_to_video(scripts, user_id);
         if (!audio_file) {
@@ -257,11 +256,9 @@ app.post('/api/add_script', async (req, res) => {
         //console.log('videoPath in add_script_function', videoPath);
         if (videoPath) {
             //console.log('Video path:', videoPath);
-            const token = req.cookies.token;
-            if (!token) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-            const user_id = jwt.verify(token, process.env.JWT_SECRET).user_id;
+            
+           
+           
             const { access_token, refresh_token, expiry_date } = await refreshAccessToken(user_id);
             OAuth2Client.setCredentials({ access_token, refresh_token, expiry_date });
             const youtubeInstance = new google.youtube({
@@ -340,15 +337,11 @@ app.post('/api/add_script', async (req, res) => {
 })
 
 
-app.get('/api/get_user_collections', async (req, res) => {
+app.get('/api/get_user_collections',  middleware,async (req, res) => {
     try {
-        const token = req.cookies.token;
-        //console.log(token);
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-        const user_id = jwt.verify(token, process.env.JWT_SECRET).user_id;
-        const get_collection_query = `SELECT title,asset_id,youtube_id,playback_url,created_at,video_status FROM videos WHERE user_id=$1`
+        
+        const user_id = req.user;
+        const get_collection_query = `SELECT title,asset_id,youtube_id,playback_url,created_at,video_status FROM videos WHERE user_id=$1 ORDER BY created_at DESC`
         const values = [user_id];
         const get_collection_result = await pg.query(get_collection_query, values);
         if (get_collection_result.rowCount === 0) {
