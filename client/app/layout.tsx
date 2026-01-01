@@ -15,8 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "YouTube Shorts Manager",
-  description: "Manage and upload your YouTube Shorts with ease.",
+   title: "YouTube Shorts Manager",
+  description: "Manage, create, and upload your YouTube Shorts with ease. Free TTS integration for dynamic videos.",
+
+  // Basic SEO
+  keywords: ["YouTube Shorts", "video manager", "TTS", "upload videos", "short videos", "video editor"],
+  authors: [{ name: "Your Name or Company", url: "https://yt-bot-five.vercel.app" }],
+  creator: "Aditya Dadhich",
+  publisher: "Aditya Dadhich",
 };
 
 export default function RootLayout({
