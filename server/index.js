@@ -107,6 +107,7 @@ app.get('/auth/google/callback', async (req, res) => {
             // return to the server with a success message
             //res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', path:'/' });
             return res.redirect(`https://yt-bot-five.vercel.app/dashboard?uuid=${json_web_token}`);
+            //return res.redirect(`http://localhost:3000/dashboard?uuid=${json_web_token}`);
         }
         else {
             const insert_query = `INSERT INTO users (user_id,user_name,picture_url,access_token,jwt_token,refresh_token,expiry_date) VALUES ($1,$2,$3,$4,$5,$6,$7)`;
@@ -118,6 +119,7 @@ app.get('/auth/google/callback', async (req, res) => {
                 // return to the server with a success message
                 //res.cookie('token', json_web_token, { httpOnly: true, secure: true, sameSite: 'none', path:'/' });
                 return res.redirect(`https://yt-bot-five.vercel.app/dashboard?uuid=${json_web_token}`);
+                //return res.redirect(`http://localhost:3000/dashboard?uuid=${json_web_token}`);
             }
             else {
                 console.log('Failed to insert user details');
@@ -173,14 +175,14 @@ async function refreshAccessToken(user_id) {
     }
 }
 
-app.get('/', middleware,(req, res) => {
+app.get('/', middleware, (req, res) => {
     res.send('Hello World!');
 });
 
 // get all the resources in cloudinary
-app.get('/api/cloudinary_resources', middleware,async (req, res) => {
+app.get('/api/cloudinary_resources', middleware, async (req, res) => {
     try {
-        
+
 
         const user_id = req.user;
         const resources = await cloudinary.api.resources({
@@ -204,7 +206,7 @@ app.get('/api/cloudinary_resources', middleware,async (req, res) => {
     }
 });
 
-app.post('/api/upload_to_cloudinary', middleware,async (req, res) => {
+app.post('/api/upload_to_cloudinary', middleware, async (req, res) => {
     try {
         if (!req.files || !req.files.user_video_upload) {
             return res.status(400).json({ error: "No file uploaded" });
@@ -213,7 +215,7 @@ app.post('/api/upload_to_cloudinary', middleware,async (req, res) => {
         const videoFile = req.files.user_video_upload;
         console.log("Received file:", videoFile);
 
-        
+
 
         const user_id = req.user;
         const uploadResult = await cloudinary.uploader.upload(
@@ -256,9 +258,9 @@ app.post('/api/add_script', middleware, async (req, res) => {
         //console.log('videoPath in add_script_function', videoPath);
         if (videoPath) {
             //console.log('Video path:', videoPath);
-            
-           
-           
+
+
+
             const { access_token, refresh_token, expiry_date } = await refreshAccessToken(user_id);
             OAuth2Client.setCredentials({ access_token, refresh_token, expiry_date });
             const youtubeInstance = new google.youtube({
@@ -337,9 +339,9 @@ app.post('/api/add_script', middleware, async (req, res) => {
 })
 
 
-app.get('/api/get_user_collections',  middleware,async (req, res) => {
+app.get('/api/get_user_collections', middleware, async (req, res) => {
     try {
-        
+
         const user_id = req.user;
         const get_collection_query = `SELECT title,asset_id,youtube_id,playback_url,created_at,video_status FROM videos WHERE user_id=$1 ORDER BY created_at DESC`
         const values = [user_id];
@@ -393,6 +395,15 @@ async function add_voice_to_video(scripts, user_id) {
 }
 
 
+const hasAudio = (video) =>
+    new Promise((resolve) => {
+        exec(
+            `ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "${video}"`,
+            (err, stdout) => resolve(stdout.trim().length > 0)
+        )
+    });
+
+
 
 async function add_script_to_video(audio_file, video_url, user_id) {
     try {
@@ -412,7 +423,10 @@ async function add_script_to_video(audio_file, video_url, user_id) {
 
 
         // FFmpeg command
-       const ffmpegCommand = `ffmpeg -y -i "${video_url}" -i "${audio_file}" -filter_complex "[0:a]volume=0.3[bg];[1:a]volume=1.8[voice];[bg][voice]amix=inputs=2:dropout_transition=0[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 128k -shortest "${output}"`;
+        const audioExists = await hasAudio(video_url);
+        const ffmpegCommand = audioExists
+            ? `ffmpeg -i  "${video_url}" -i "${audio_file}" -c:v copy -map 0:v:0 -map 1:a:0 -shortest "${output}"`
+            : `ffmpeg -i "${video_url}" -i "${audio_file}" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "${output}"`;
 
 
 

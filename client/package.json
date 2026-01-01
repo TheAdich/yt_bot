@@ -7,13 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prepare":"echo \"Client setup complete.\""
+    "prepare": "echo \"Client setup complete.\""
   },
   "dependencies": {
+    "@types/react-speech-recognition": "^3.9.6",
     "axios": "^1.13.2",
     "next": "16.0.8",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "react-speech-recognition": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -1,14 +1,19 @@
 'use client'
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import ServerStatusList from '../components/uploading_status/uploading_status';
 import Loading from '../components/loader/loading';
 import { Navbar } from '../components/Navbar/navbar';
 import UploadSuccess from '../components/success_upload/VideoUploadSuccess';
-import { type } from 'node:os';
+import UploadFailure from '../components/failure_upload/failure_upload';
+
 
 export default function Upload() {
 
+
+    
+
+    const recognition = useRef<SpeechRecognition>(null);
     const [videoList, setVideoList] = useState<Array<{ display_name: string, url: string }>>([]);
     const [selectedVideo, setSelectedVideo] = useState<{ index: Number, display_name: string, url: string } | null>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -20,6 +25,15 @@ export default function Upload() {
     const [refreshVideoList, setRefreshVideoList] = useState(false);
     const [isVideoUploading, setIsVideoUploading] = useState(false);
     const [VideoUploadComponent, setVideoUploadComponent] = useState<boolean>(false);
+    const [showUploadFailure, setShowUploadFailure] = useState<boolean>(false);
+    const [language, setLanguage] = useState<string>('en-IN');
+    const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
+    const [showInterimTranscript, setShowInterimTranscript] = useState<string>("");
+
+
+
+
+
 
 
 
@@ -50,6 +64,41 @@ export default function Upload() {
         }
         fetchVideoLists();
     }, [refreshVideoList])
+
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            recognition.current = new (window.SpeechRecognition || (window as any).webkitSpeechRecognition)();
+            recognition.current.lang = language;
+            recognition.current.interimResults = true;
+            recognition.current.continuous = true;
+
+            recognition.current!.onresult = function (event) {
+                var interim_transcript = '';
+                var final_transcript = '';
+
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        final_transcript += event.results[i][0].transcript;
+                        //console.log(scriptContent);
+                        setScriptContent(prev => prev ? prev + " " + final_transcript : final_transcript);
+                        setIsSpeechEnabled(false);
+                        setShowInterimTranscript("");
+                        recognition.current!.stop();
+                    } else {
+                        interim_transcript += event.results[i][0].transcript;
+                        setShowInterimTranscript(interim_transcript);
+                        //setScriptContent(prev => prev ? prev + " " + interim_transcript : interim_transcript);
+                    }
+                }
+                //console.log(interim_transcript, final_transcript);
+            };
+
+        }
+    }, [])
+
+    
+
 
     const handleVideoSelect = (video: { index: Number, display_name: string, url: string }) => {
         setSelectedVideo(video);
@@ -87,6 +136,7 @@ export default function Upload() {
             }
         } catch (err) {
             console.error("Error submitting script:", err);
+            setShowUploadFailure(true);
         }
         finally {
             setIsUploading(false);
@@ -117,6 +167,23 @@ export default function Upload() {
         finally {
             setRefreshVideoList(true);
             setIsVideoUploading(false);
+        }
+    }
+
+    //console.log(window.speechSynthesis.getVoices());
+
+
+
+
+
+
+    function speechToggle(enable: boolean) {
+        console.log("Speech recognition enabled:", enable);
+        if (!enable) {
+            recognition.current!.stop();
+        }
+        else {
+            recognition.current!.start();
         }
     }
 
@@ -166,26 +233,58 @@ export default function Upload() {
                         {/* Script Input */}
                         <div className="flex flex-col">
                             <label className="text-sm font-black uppercase tracking-wider text-[#4A6163] mb-2">Script Content (Text to Audio)</label>
+                            <p className='text-sm font-mono text-[#4A6163]'>Current language : {language === 'en-IN' ? 'English (India)' : 'Hindi (India)'}</p>
+                            <button onClick={() => {
+                                setLanguage(language === 'en-IN' ? 'hi-IN' : 'en-IN');
+                                recognition.current!.lang = language === 'en-IN' ? 'hi-IN' : 'en-IN';
+                            }} className='cursor-pointer mt-2  px-3 py-1 bg-[#4A6163] text-white rounded-md'>Change Language</button>
                             <textarea
                                 onChange={(e) => setScriptContent(e.target.value)}
-                                className="w-full h-[320px] bg-white border-2 border-[#4A6163] rounded-xl p-4 outline-none 
+                                value={scriptContent + (isSpeechEnabled ? " " + showInterimTranscript : "")}
+                                className="mt-2 w-full h-[320px] bg-white border-2 border-[#4A6163] rounded-xl p-4 outline-none 
                                    focus:border-[#F9A66C] focus:shadow-[4px_4px_0px_0px_#F9A66C] 
                                    transition-all resize-none placeholder:text-[#4A6163]/40 font-mono text-sm"
                                 placeholder="Write your script here..."
                             />
+
                         </div>
 
-                        {/* Submit Button: Solid Dark Slate with Pink Hover */}
-                        <button
-                            onClick={handleScriptSubmission}
-                            disabled={isUploading}
-                            className={`mt-2 px-8 py-4 bg-[#4A6163] text-[#F9FAF4] font-black uppercase tracking-widest rounded-xl 
+                        {/* Voice Input Toggle */}
+                        <div className="flex items-center gap-4">
+                            {isSpeechEnabled ? (
+                                <button onClick={() => {
+                                    setIsSpeechEnabled(false);
+                                    speechToggle(false);
+                                }} className='px-5 py-3 bg-[#F17A7E] text-white font-black uppercase tracking-widest rounded-xl
+                               border-2 border-transparent hover:bg-[#4A6163] hover:text-[#F9FAF4] hover:border-[#F9FAF4] 
+                               hover:shadow-[4px_4px_0px_0px_#4A6163] hover:-translate-y-1 transition-all duration-200'>
+                                    Disable Voice Input
+                                </button>
+                            ) : (
+                                <button onClick={() => {
+                                    setIsSpeechEnabled(true);
+                                    speechToggle(true);
+                                }} className='px-5 py-3 bg-[#4A6163] text-[#F9FAF4] font-black uppercase tracking-widest rounded-xl
+                               border-2 border-transparent hover:bg-[#F17A7E] hover:text-[#4A6163] hover:border-[#4A6163] 
+                               hover:shadow-[4px_4px_0px_0px_#4A6163] hover:-translate-y-1 transition-all duration-200'>
+                                    Enable Voice Input
+                                </button>
+                            )}
+
+                            {/* Submit Button: Solid Dark Slate with Pink Hover */}
+                            <button
+                                onClick={handleScriptSubmission}
+                                disabled={isUploading}
+                                className={`px-2 py-3 bg-[#4A6163] text-[#F9FAF4] font-black uppercase tracking-widest rounded-xl 
                                border-2 border-transparent hover:bg-[#F17A7E] hover:text-[#4A6163] hover:border-[#4A6163] 
                                hover:shadow-[4px_4px_0px_0px_#4A6163] hover:-translate-y-1 transition-all duration-200
                                ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
-                        >
-                            {isUploading ? "Submitting..." : "Submit Script"}
-                        </button>
+                            >
+                                {isUploading ? "Submitting..." : "Submit Script"}
+                            </button>
+                        </div>
+
+
 
                     </div>
 
@@ -289,6 +388,7 @@ export default function Upload() {
                 )}
 
                 {VideoUploadComponent && <UploadSuccess />}
+                {showUploadFailure && <UploadFailure />}
 
 
             </div>

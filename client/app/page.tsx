@@ -1,10 +1,11 @@
 'use client';
 import React from "react";
 import axios from "axios";
+import {useRouter} from 'next/navigation';
 
 export default function LandingPage() {
 
-
+  const router = useRouter();
   function handleSubmit() {
     window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`;
   }
@@ -40,7 +41,7 @@ export default function LandingPage() {
         </div>
 
         {/* Preview Area (Retro Monitor/Card Style) */}
-        <div className="mt-20 w-full max-w-4xl h-80 rounded-3xl border-4 border-[#4A6163] bg-[#F9FAF4] shadow-[16px_16px_0px_0px_#4A6163] flex items-center justify-center group hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden">
+        <div onClick={()=>router.push('/dashboard')} className="mt-20  cursor-pointer w-full max-w-4xl h-80 rounded-3xl border-4 border-[#4A6163] bg-[#F9FAF4] shadow-[16px_16px_0px_0px_#4A6163] flex items-center justify-center group hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden">
           {/* Fake UI Elements for "Wireframe" look */}
           <div className="absolute top-0 left-0 w-full h-12 border-b-4 border-[#4A6163] bg-[#FFC94B] flex items-center px-4 gap-2">
             <div className="w-4 h-4 rounded-full border-2 border-[#4A6163] bg-[#F17A7E]"></div>
@@ -48,11 +49,11 @@ export default function LandingPage() {
             <div className="w-4 h-4 rounded-full border-2 border-[#4A6163] bg-[#F9FAF4]"></div>
           </div>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-8 ">
             <div className="w-20 h-20 mx-auto bg-[#4A6163] rounded-full flex items-center justify-center mb-4 text-[#F9FAF4] group-hover:scale-110 transition-transform duration-300 shadow-[4px_4px_0px_0px_#F9A66C]">
               <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
             </div>
-            <p className="text-[#4A6163] font-black uppercase tracking-widest">Dashboard Preview</p>
+            <p  className="text-[#4A6163]  font-black uppercase tracking-widest">Go to your Dashboard</p>
           </div>
         </div>
 
@@ -66,17 +67,18 @@ export default function LandingPage() {
               num: "01"
             },
             {
-              title: "Smart Scheduling",
-              desc: "Schedule Shorts publishing exactly like YouTube’s native scheduler.",
+              title: "Voice-Over Automation",
+              desc: "Generate natural-sounding voice-overs from your script using a fully self-hosted open-source TTS engine.",
               color: "bg-[#FFC94B]", // Yellow
               num: "02"
             },
             {
-              title: "Deep Analytics",
-              desc: "Track impressions, retention, and engagement in a modern dashboard.",
+              title: "Audio-Video Sync Engine",
+              desc: "Automatically mixes voice-overs with existing video audio using FFmpeg for perfect timing and clarity.",
               color: "bg-[#F17A7E]", // Pink
               num: "03"
             }
+
           ].map((feature, idx) => (
             <div key={idx} className={`relative p-8 rounded-2xl border-4 border-[#4A6163] ${feature.color} 
                                        text-[#4A6163] transition-all duration-300 hover:-translate-y-2 
