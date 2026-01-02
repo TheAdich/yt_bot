@@ -17,9 +17,6 @@ RUN python3 -m pip install --upgrade pip setuptools wheel
 RUN python3 -m pip install "piper-tts[http]"
 
 
-# RUN python3 -m piper.download_voices en_US-lessac-medium
-# RUN python3 -m piper.download_voices hi_IN-rohan-medium
-# RUN python3 -m piper.download_voices en_GB-northern_english_male-medium
 RUN python3 -m piper.download_voices hi_IN-pratham-medium
 
 EXPOSE 5001

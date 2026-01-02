@@ -30,8 +30,8 @@ export default function LandingPage() {
         {/* Title Section */}
         <div className="max-w-5xl text-center space-y-6">
           <h1 className="text-7xl md:text-9xl font-black uppercase tracking-tighter leading-[0.9]">
-            <span className="block text-[#4A6163]">Shorts</span>
-            <span className="block text-[#F9A66C]">Manager</span>
+            <span className="block text-[#4A6163]">YTShorts Automator</span>
+            <span className="block text-[#F9A66C]">by AD</span>
           </h1>
 
           <p className="text-xl md:text-2xl font-bold text-[#4A6163]/70 leading-relaxed max-w-2xl mx-auto mt-6">

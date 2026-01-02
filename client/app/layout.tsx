@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Loading from "./components/loader/loading";
+import Footer from "./components/Footer/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,13 +15,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
+
 export const metadata: Metadata = {
-   title: "YouTube Shorts Manager",
-  description: "Manage, create, and upload your YouTube Shorts with ease. Free TTS integration for dynamic videos.",
+  verification:{
+    google:"bJYHDIvN5ZC3PONTgmKnhAGYIHrXrQ_f7uqzftqY_jM"
+  },
+   title: "YTShorts Automator by AD",
+  description: "Manage, create, and upload your YouTube Shorts with ease from YTShorts Automator by AD. Free TTS integration for dynamic videos.",
 
   // Basic SEO
-  keywords: ["YouTube Shorts", "video manager", "TTS", "upload videos", "short videos", "video editor"],
-  authors: [{ name: "Your Name or Company", url: "https://yt-bot-five.vercel.app" }],
+  keywords: ["YTShorts", "YouTube Shorts", "video manager", "TTS", "upload videos", "short videos", "video editor"],
+  authors: [{ name: "Aditya Dadhich", url: "https://yt-bot-five.vercel.app" }],
   creator: "Aditya Dadhich",
   publisher: "Aditya Dadhich",
 };
@@ -37,6 +43,7 @@ export default function RootLayout({
       >
         <Suspense fallback={<Loading />}>
         {children}
+        <Footer />  
         </Suspense>
       </body>
     </html>

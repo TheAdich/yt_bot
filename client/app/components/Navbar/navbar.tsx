@@ -19,12 +19,26 @@ export function Navbar() {
                     onClick={() => window.location.href = '/'} 
                     className="cursor-pointer text-xl font-black uppercase leading-tight text-[#F9FAF4] tracking-wide"
                 >
-                    Shorts<br/>Manager
+                    YTShorts Automator <br/> by AD
                 </h1>
             </div>
 
             {/* NAVIGATION LINKS */}
             <nav className="flex flex-col gap-4">
+
+                <Link
+                    href="/dashboard"
+                    /* HOVER STATE:
+                       - Background becomes Pink (#F17A7E)
+                       - Text becomes Dark Slate (#4A6163)
+                       - Slight movement to the right (translate-x-1)
+                    */
+                    className="px-5 py-3 rounded-xl text-[#F9FAF4] font-bold border-2 border-transparent hover:bg-[#F17A7E] hover:text-[#4A6163] hover:border-[#4A6163] transition-all duration-200 hover:translate-x-1"
+                >
+                    Dashboard
+                </Link>
+
+
                 <Link
                     href="/library"
                     /* HOVER STATE:
@@ -44,14 +58,6 @@ export function Navbar() {
                     Upload New
                 </Link>
             </nav>
-
-            {/* USER PROFILE SECTION - Bottom */}
-            {/* Changed to a high-contrast "Card" look: Cream background, Dark Text */}
-            <div className="mt-auto flex items-center gap-3 bg-[#F9FAF4] px-4 py-3 rounded-xl shadow-lg transform transition hover:-translate-y-1 cursor-pointer">
-                {/* Avatar: Solid Orange */}
-                <div className="w-8 h-8 bg-[#F9A66C] rounded-full border-2 border-[#4A6163]" />
-                <span className="text-sm font-bold text-[#4A6163]">Alex Creator</span>
-            </div>
         </aside>
     )
 }
