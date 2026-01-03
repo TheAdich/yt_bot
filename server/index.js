@@ -425,8 +425,9 @@ async function add_script_to_video(audio_file, video_url, user_id) {
         // FFmpeg command
         const audioExists = await hasAudio(video_url);
         const ffmpegCommand = audioExists
-            ? `ffmpeg -i  "${video_url}" -i "${audio_file}" -c:v copy -map 0:v:0 -map 1:a:0  "${output}"`
-            : `ffmpeg -i "${video_url}" -i "${audio_file}" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0  "${output}"`;
+            ? `ffmpeg -i "${video_url}" -i "${audio_file}" -filter_complex "[0:a][1:a]amix=inputs=2:dropout_transition=0" -map 0:v:0 -map "[a]" -c:v copy -c:a aac "${output}"`
+            : `ffmpeg -i "${video_url}" -i "${audio_file}" -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac "${output}"`;
+
 
 
         console.log('Running FFmpeg...');
