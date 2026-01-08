@@ -26,7 +26,6 @@ export default function Upload() {
     const [isVideoUploading, setIsVideoUploading] = useState(false);
     const [VideoUploadComponent, setVideoUploadComponent] = useState<boolean>(false);
     const [showUploadFailure, setShowUploadFailure] = useState<boolean>(false);
-    const [language, setLanguage] = useState<string>('en-IN');
     const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
     const [showInterimTranscript, setShowInterimTranscript] = useState<string>("");
 
@@ -69,7 +68,7 @@ export default function Upload() {
     useEffect(() => {
         if (typeof window !== 'undefined') {
             recognition.current = new (window.SpeechRecognition || (window as any).webkitSpeechRecognition)();
-            recognition.current.lang = language;
+           
             recognition.current.interimResults = true;
             recognition.current.continuous = true;
 
@@ -233,11 +232,8 @@ export default function Upload() {
                         {/* Script Input */}
                         <div className="flex flex-col">
                             <label className="text-sm font-black uppercase tracking-wider text-[#4A6163] mb-2">Script Content (Text to Audio)</label>
-                            <p className='text-sm font-mono text-[#4A6163]'>Current language : {language === 'en-IN' ? 'English (India)' : 'Hindi (India)'}</p>
-                            <button onClick={() => {
-                                setLanguage(language === 'en-IN' ? 'hi-IN' : 'en-IN');
-                                recognition.current!.lang = language === 'en-IN' ? 'hi-IN' : 'en-IN';
-                            }} className='cursor-pointer mt-2  px-3 py-1 bg-[#4A6163] text-white rounded-md'>Change Language</button>
+                            <p className='text-sm font-mono text-[#4A6163]'>If enable voice input speak Hindi*</p>
+                           
                             <textarea
                                 onChange={(e) => setScriptContent(e.target.value)}
                                 value={scriptContent + (isSpeechEnabled ? " " + showInterimTranscript : "")}

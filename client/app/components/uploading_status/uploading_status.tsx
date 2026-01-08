@@ -5,9 +5,7 @@ const ServerStatusList = () => {
         "2. Video Processing",
         "3. Google Authentication",
         "4. Uploading to CDN",
-        "5. Uploading to YouTube",
-        "6. Saving Metadata",
-        "7. Finalizing"
+        "5. Finalizing"
     ];
 
     return (
