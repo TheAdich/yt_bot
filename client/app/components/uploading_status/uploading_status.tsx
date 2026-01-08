@@ -3,9 +3,8 @@ const ServerStatusList = () => {
     const steps = [
         "1. Audio Processing (TTS)",
         "2. Video Processing",
-        "3. Google Authentication",
-        "4. Uploading to CDN",
-        "5. Finalizing"
+        "3. Uploading to CDN",
+        "4. Finalizing"
     ];
 
     return (
