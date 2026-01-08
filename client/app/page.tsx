@@ -7,7 +7,7 @@ export default function LandingPage() {
 
   const router = useRouter();
   function handleSubmit() {
-    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`;
+    router.push('/register');
   }
 
 

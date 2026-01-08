@@ -9,7 +9,6 @@ export default function Library() {
     const [userVideoList, setUserVideoList] = useState<Array<{
         title: string
         asset_id: string
-        youtube_id: string
         playback_url: string
         video_status: string
         created_at: string
@@ -125,7 +124,7 @@ export default function Library() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            window.open(`https://youtube.com/shorts/${item.youtube_id}`, '_blank');
+                                            window.open(`${item.playback_url}`, '_blank');
                                         }}
                                         className="px-4 py-2 bg-[#F9FAF4] border-2 border-[#4A6163] rounded-lg 
                                            text-[#4A6163] font-black text-xs uppercase tracking-wide
