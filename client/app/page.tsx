@@ -59,42 +59,42 @@ export default function LandingPage() {
 
         {/* Features Grid - Pop Art Style */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-6xl w-full">
-          {[
-            {
-              title: "Bulk Uploads",
-              desc: "Upload 20–30 Shorts consistently just like YouTube Studio bulk tools.",
-              color: "bg-[#F9A66C]", // Orange
-              num: "01"
-            },
-            {
-              title: "Voice-Over Automation",
-              desc: "Generate natural-sounding voice-overs from your script using a fully self-hosted open-source TTS engine.",
-              color: "bg-[#FFC94B]", // Yellow
-              num: "02"
-            },
-            {
-              title: "Audio-Video Sync Engine",
-              desc: "Automatically mixes voice-overs with existing video audio using FFmpeg for perfect timing and clarity.",
-              color: "bg-[#F17A7E]", // Pink
-              num: "03"
-            }
+  {[
+    {
+      title: "Script to Audio",
+      desc: "Convert your video scripts into natural-sounding voice-overs using our fully self-hosted TTS engine.",
+      color: "bg-[#F9A66C]", 
+      num: "01"
+    },
+    {
+      title: "Audio-Video Sync",
+      desc: "Automatically integrate the generated voice-over into your video with perfect timing using FFmpeg.",
+      color: "bg-[#FFC94B]", 
+      num: "02"
+    },
+    {
+      title: "Seamless Video Output",
+      desc: "Get your final video ready to download or share with audio perfectly synced, no analytics, no extra steps.",
+      color: "bg-[#F17A7E]", 
+      num: "03"
+    }
+  ].map((feature, idx) => (
+    <div key={idx} className={`relative p-8 rounded-2xl border-4 border-[#4A6163] ${feature.color} 
+                               text-[#4A6163] transition-all duration-300 hover:-translate-y-2 
+                               hover:shadow-[12px_12px_0px_0px_#4A6163] group`}>
 
-          ].map((feature, idx) => (
-            <div key={idx} className={`relative p-8 rounded-2xl border-4 border-[#4A6163] ${feature.color} 
-                                       text-[#4A6163] transition-all duration-300 hover:-translate-y-2 
-                                       hover:shadow-[12px_12px_0px_0px_#4A6163] group`}>
+      <div className="absolute -top-6 -left-6 text-6xl font-black text-[#4A6163] opacity-20 group-hover:scale-110 transition-transform">
+        {feature.num}
+      </div>
 
-              <div className="absolute -top-6 -left-6 text-6xl font-black text-[#4A6163] opacity-20 group-hover:scale-110 transition-transform">
-                {feature.num}
-              </div>
+      <h3 className="text-2xl font-black uppercase mb-4 relative z-10">{feature.title}</h3>
+      <p className="font-bold text-[#4A6163]/80 leading-snug relative z-10">
+        {feature.desc}
+      </p>
+    </div>
+  ))}
+</div>
 
-              <h3 className="text-2xl font-black uppercase mb-4 relative z-10">{feature.title}</h3>
-              <p className="font-bold text-[#4A6163]/80 leading-snug relative z-10">
-                {feature.desc}
-              </p>
-            </div>
-          ))}
-        </div>
 
         {/* CTA Button */}
         <button onClick={handleSubmit} className="mt-24 px-16 py-6 rounded-2xl bg-[#4A6163] text-[#F9FAF4] 

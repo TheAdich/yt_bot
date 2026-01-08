@@ -19,17 +19,11 @@ export default function Footer() {
           <h4 className="font-black uppercase tracking-widest">Product</h4>
           <ul className="space-y-2 font-bold">
             <li><Link href="/dashboard" className="hover:underline">Dashboard</Link></li>
-            <li><Link href="/privacy_policy" className="hover:underline">Privacy Policy</Link></li>
+            
           </ul>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="font-black uppercase tracking-widest">Legal</h4>
-          <p className="font-bold text-[#4A6163]/70">
-            This app uses Google OAuth for authentication and follows Google API
-            Services User Data Policy.
-          </p>
-        </div>
+        
 
       </div>
 
